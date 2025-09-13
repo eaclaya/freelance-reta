@@ -1,6 +1,6 @@
 # RETA Freelance Accounting
 
-A comprehensive freelance accounting application designed specifically for Spanish autónomos (self-employed workers) under the RETA (Régimen Especial de Trabajadores Autónomos) system.
+A comprehensive freelance accounting application designed specifically for Spanish freelancers (self-employed workers) under the RETA (Régimen Especial de Trabajadores Autónomos) system.
 
 ## Features
 
@@ -26,7 +26,7 @@ A comprehensive freelance accounting application designed specifically for Spani
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm, yarn, pnpm, or bun
 
 ### Installation
@@ -71,6 +71,7 @@ npm start
 ## Database Schema
 
 The application uses Prisma with the following main entities:
+
 - **Clients**: Customer information and contact details
 - **Invoices**: Invoice records with line items and status tracking
 - **Expenses**: Business expense records with categories
@@ -80,6 +81,7 @@ The application uses Prisma with the following main entities:
 ## Spanish Tax Compliance
 
 This application is specifically designed for Spanish freelancers and includes:
+
 - Quarterly tax deadline tracking (Modelo 130, Modelo 303)
 - RETA status monitoring
 - Spanish tax calendar integration
