@@ -1,0 +1,225 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String?
+  phone       String?
+  address     String?
+  taxId       String?  // NIF/NIE
+  retaNumber  String?  // RETA registration number
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  clients     Client[]
+  invoices    Invoice[]
+  expenses    Expense[]
+  reminders   Reminder[]
+  taxReports  TaxReport[]
+}
+
+model Client {
+  id           String   @id @default(cuid())
+  name         String
+  email        String?
+  phone        String?
+  address      String?
+  taxId        String?  // For EU clients
+  country      String
+  isUSClient   Boolean  @default(false)
+  currency     String   @default("EUR") // USD, EUR
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userId       String
+
+  // Relations
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices     Invoice[]
+  
+  @@unique([name, userId])
+}
+
+model Invoice {
+  id                String      @id @default(cuid())
+  number            String      @unique
+  date              DateTime
+  dueDate           DateTime?
+  status            InvoiceStatus @default(DRAFT)
+  
+  // Amounts in cents to avoid floating point issues
+  subtotalCents     Int         // Amount before taxes
+  vatRate           Float       @default(21.0) // Spanish IVA rate
+  vatAmountCents    Int         // VAT amount
+  totalCents        Int         // Total amount
+  
+  // Tax withholdings (for Spanish clients)
+  withholdingRate   Float?      // 7% for new autonomos, 15% for others
+  withholdingAmountCents Int?    // Amount withheld
+  
+  // Currency and conversion
+  currency          String      @default("EUR")
+  exchangeRate      Float?      // If USD, rate to EUR at invoice date
+  totalEurCents     Int?        // Total in EUR for tax purposes
+  
+  description       String?
+  notes             String?
+  
+  // Payment tracking
+  paidDate          DateTime?
+  paymentMethod     String?
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  userId            String
+  clientId          String
+
+  // Relations
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client            Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  items             InvoiceItem[]
+}
+
+model InvoiceItem {
+  id              String   @id @default(cuid())
+  description     String
+  quantity        Float    @default(1)
+  unitPriceCents  Int      // Price per unit in cents
+  totalCents      Int      // quantity * unitPrice in cents
+  invoiceId       String
+
+  // Relations
+  invoice         Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id              String        @id @default(cuid())
+  date            DateTime
+  description     String
+  category        ExpenseCategory
+  amountCents     Int           // Amount in cents
+  currency        String        @default("EUR")
+  exchangeRate    Float?        // If USD, rate to EUR
+  amountEurCents  Int?          // Amount in EUR for tax purposes
+  vatRate         Float?        // VAT rate if applicable
+  vatAmountCents  Int?          // VAT amount in cents
+  isDeductible    Boolean       @default(true)
+  receipt         String?       // File path or URL to receipt
+  notes           String?
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  userId          String
+
+  // Relations
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TaxReport {
+  id              String          @id @default(cuid())
+  year            Int
+  quarter         Int?            // 1-4 for quarterly, null for annual
+  type            TaxReportType
+  status          ReportStatus    @default(DRAFT)
+  
+  // Calculated amounts in cents
+  totalIncomeCents      Int
+  totalExpensesCents    Int
+  netIncomeCents        Int
+  vatCollectedCents     Int?
+  vatPaidCents          Int?
+  vatOwedCents          Int?
+  withholdingsCents     Int?
+  taxOwedCents          Int?
+  
+  filingDate      DateTime?
+  dueDate         DateTime
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  userId          String
+
+  // Relations
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Reminder {
+  id          String         @id @default(cuid())
+  title       String
+  description String?
+  type        ReminderType
+  date        DateTime
+  completed   Boolean        @default(false)
+  recurring   Boolean        @default(false)
+  frequency   Frequency?     // If recurring
+  
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  userId      String
+
+  // Relations
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Enums
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum ExpenseCategory {
+  OFFICE_SUPPLIES
+  EQUIPMENT
+  SOFTWARE
+  PROFESSIONAL_SERVICES
+  TRAVEL
+  MEALS
+  INTERNET
+  PHONE
+  RENT
+  UTILITIES
+  INSURANCE
+  EDUCATION
+  MARKETING
+  OTHER
+}
+
+enum TaxReportType {
+  QUARTERLY_INCOME  // Modelo 130
+  QUARTERLY_VAT     // Modelo 303
+  ANNUAL_INCOME     // Modelo 100
+  ANNUAL_SUMMARY    // Modelo 390
+}
+
+enum ReportStatus {
+  DRAFT
+  FILED
+  PAID
+}
+
+enum ReminderType {
+  TAX_FILING
+  INVOICE_DUE
+  PAYMENT_RECEIVED
+  EXPENSE_DEADLINE
+  RETA_PAYMENT
+  GENERAL
+}
+
+enum Frequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
