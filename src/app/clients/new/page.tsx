@@ -77,6 +77,9 @@ export default function NewClientPage() {
               <Button variant="ghost">Expenses</Button>
               <Button variant="ghost">Reports</Button>
               <Button variant="ghost">Calendar</Button>
+              <Button variant="ghost" asChild>
+                <a href="/profile">Profile</a>
+              </Button>
             </nav>
           </div>
         </div>

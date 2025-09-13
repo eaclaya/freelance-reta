@@ -1,19 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function POST(request: NextRequest) {
+interface RouteParams {
+  params: {
+    id: string
+  }
+}
+
+export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     const body = await request.json()
+    const { completed } = body
     
-    const { name, email, phone, address, taxId, country, currency } = body
-    
-    if (!name || !country || !currency) {
-      return NextResponse.json(
-        { error: 'Name, country, and currency are required' },
-        { status: 400 }
-      )
-    }
-
     // Get or create a default user for demo purposes
     let user = await prisma.user.findFirst()
     if (!user) {
@@ -29,31 +27,35 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const client = await prisma.client.create({
-      data: {
-        name,
-        email: email || null,
-        phone: phone || null,
-        address: address || null,
-        taxId: taxId || null,
-        country,
-        currency,
-        isUSClient: currency === 'USD',
+    const reminder = await prisma.reminder.update({
+      where: { 
+        id: params.id,
         userId: user.id
+      },
+      data: {
+        completed
       }
     })
 
-    return NextResponse.json({ success: true, client })
+    return NextResponse.json({ success: true, reminder })
   } catch (error) {
-    console.error('Error creating client:', error)
+    console.error('Error updating reminder:', error)
+    
+    if (error.code === 'P2025') {
+      return NextResponse.json(
+        { error: 'Reminder not found' },
+        { status: 404 }
+      )
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to create client' },
+      { error: 'Failed to update reminder' },
       { status: 500 }
     )
   }
 }
 
-export async function GET() {
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     // Get or create a default user for demo purposes
     let user = await prisma.user.findFirst()
@@ -70,21 +72,26 @@ export async function GET() {
       })
     }
 
-    const clients = await prisma.client.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        _count: {
-          select: { invoices: true }
-        }
+    await prisma.reminder.delete({
+      where: { 
+        id: params.id,
+        userId: user.id
       }
     })
 
-    return NextResponse.json({ success: true, clients })
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error fetching clients:', error)
+    console.error('Error deleting reminder:', error)
+    
+    if (error.code === 'P2025') {
+      return NextResponse.json(
+        { error: 'Reminder not found' },
+        { status: 404 }
+      )
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to fetch clients' },
+      { error: 'Failed to delete reminder' },
       { status: 500 }
     )
   }

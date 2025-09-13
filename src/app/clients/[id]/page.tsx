@@ -12,8 +12,26 @@ interface ClientDetailPageProps {
 }
 
 export default async function ClientDetailPage({ params }: ClientDetailPageProps) {
+  // Get or create a default user for demo purposes
+  let user = await prisma.user.findFirst()
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email: 'demo@freelancer.es',
+        name: 'Demo Freelancer',
+        phone: '+34 123 456 789',
+        address: 'Madrid, Spain',
+        taxId: '12345678Z',
+        retaNumber: 'RETA-001'
+      }
+    })
+  }
+
   const client = await prisma.client.findUnique({
-    where: { id: params.id },
+    where: { 
+      id: params.id,
+      userId: user.id
+    },
     include: {
       invoices: {
         orderBy: { createdAt: 'desc' },
@@ -58,6 +76,9 @@ export default async function ClientDetailPage({ params }: ClientDetailPageProps
               <Button variant="ghost">Expenses</Button>
               <Button variant="ghost">Reports</Button>
               <Button variant="ghost">Calendar</Button>
+              <Button variant="ghost" asChild>
+                <a href="/profile">Profile</a>
+              </Button>
             </nav>
           </div>
         </div>

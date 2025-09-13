@@ -4,7 +4,23 @@ import { Button } from "@/components/ui/button"
 import { prisma } from "@/lib/prisma"
 
 export default async function ClientsPage() {
+  // Get or create a default user for demo purposes
+  let user = await prisma.user.findFirst()
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email: 'demo@freelancer.es',
+        name: 'Demo Freelancer',
+        phone: '+34 123 456 789',
+        address: 'Madrid, Spain',
+        taxId: '12345678Z',
+        retaNumber: 'RETA-001'
+      }
+    })
+  }
+
   const clients = await prisma.client.findMany({
+    where: { userId: user.id },
     orderBy: { createdAt: 'desc' },
     include: {
       _count: {
@@ -24,10 +40,15 @@ export default async function ClientsPage() {
                 <a href="/">Dashboard</a>
               </Button>
               <Button variant="default">Clients</Button>
-              <Button variant="ghost">Invoices</Button>
+              <Button variant="ghost" asChild>
+                <a href="/invoices">Invoices</a>
+              </Button>
               <Button variant="ghost">Expenses</Button>
               <Button variant="ghost">Reports</Button>
               <Button variant="ghost">Calendar</Button>
+              <Button variant="ghost" asChild>
+                <a href="/profile">Profile</a>
+              </Button>
             </nav>
           </div>
         </div>

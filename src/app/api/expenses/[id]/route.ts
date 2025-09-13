@@ -24,34 +24,25 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       })
     }
 
-    const client = await prisma.client.findUnique({
+    const expense = await prisma.expense.findUnique({
       where: { 
         id: params.id,
         userId: user.id
-      },
-      include: {
-        invoices: {
-          orderBy: { createdAt: 'desc' },
-          take: 10
-        },
-        _count: {
-          select: { invoices: true }
-        }
       }
     })
 
-    if (!client) {
+    if (!expense) {
       return NextResponse.json(
-        { error: 'Client not found' },
+        { error: 'Expense not found' },
         { status: 404 }
       )
     }
 
-    return NextResponse.json({ success: true, client })
+    return NextResponse.json({ success: true, expense })
   } catch (error) {
-    console.error('Error fetching client:', error)
+    console.error('Error fetching expense:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch client' },
+      { error: 'Failed to fetch expense' },
       { status: 500 }
     )
   }
@@ -60,15 +51,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     const body = await request.json()
-    
-    const { name, email, phone, address, taxId, country, currency } = body
-    
-    if (!name || !country || !currency) {
-      return NextResponse.json(
-        { error: 'Name, country, and currency are required' },
-        { status: 400 }
-      )
-    }
+    const {
+      date,
+      description,
+      category,
+      amountCents,
+      currency,
+      vatRate,
+      isDeductible,
+      notes
+    } = body
 
     // Get or create a default user for demo purposes
     let user = await prisma.user.findFirst()
@@ -85,36 +77,60 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       })
     }
 
-    const client = await prisma.client.update({
+    // Calculate VAT amount if rate is provided
+    const vatAmountCents = vatRate ? Math.round(amountCents * (vatRate / 100)) : null
+
+    // Handle currency conversion for USD expenses
+    let exchangeRate = null
+    let amountEurCents = amountCents
+
+    if (currency === 'USD') {
+      // Fetch current exchange rate
+      try {
+        const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD')
+        const data = await response.json()
+        exchangeRate = data.rates.EUR
+        amountEurCents = Math.round(amountCents * exchangeRate)
+      } catch (error) {
+        console.warn('Failed to fetch exchange rate, using fallback')
+        exchangeRate = 0.85 // Fallback rate
+        amountEurCents = Math.round(amountCents * exchangeRate)
+      }
+    }
+
+    const expense = await prisma.expense.update({
       where: { 
         id: params.id,
         userId: user.id
       },
       data: {
-        name,
-        email: email || null,
-        phone: phone || null,
-        address: address || null,
-        taxId: taxId || null,
-        country,
+        date: new Date(date),
+        description,
+        category,
+        amountCents,
         currency,
-        isUSClient: currency === 'USD'
+        exchangeRate,
+        amountEurCents: currency === 'EUR' ? amountCents : amountEurCents,
+        vatRate,
+        vatAmountCents,
+        isDeductible,
+        notes
       }
     })
 
-    return NextResponse.json({ success: true, client })
+    return NextResponse.json({ success: true, expense })
   } catch (error) {
-    console.error('Error updating client:', error)
+    console.error('Error updating expense:', error)
     
     if (error.code === 'P2025') {
       return NextResponse.json(
-        { error: 'Client not found' },
+        { error: 'Expense not found' },
         { status: 404 }
       )
     }
     
     return NextResponse.json(
-      { error: 'Failed to update client' },
+      { error: 'Failed to update expense' },
       { status: 500 }
     )
   }
@@ -137,7 +153,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       })
     }
 
-    await prisma.client.delete({
+    await prisma.expense.delete({
       where: { 
         id: params.id,
         userId: user.id
@@ -146,17 +162,17 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error deleting client:', error)
+    console.error('Error deleting expense:', error)
     
     if (error.code === 'P2025') {
       return NextResponse.json(
-        { error: 'Client not found' },
+        { error: 'Expense not found' },
         { status: 404 }
       )
     }
     
     return NextResponse.json(
-      { error: 'Failed to delete client' },
+      { error: 'Failed to delete expense' },
       { status: 500 }
     )
   }

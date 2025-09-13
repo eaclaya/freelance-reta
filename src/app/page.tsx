@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/utils"
 import { ExchangeRateWidget } from "@/components/ExchangeRateWidget"
+import { ProfileSummary } from "@/components/ProfileSummary"
 
 export default function Dashboard() {
   const currentYear = new Date().getFullYear()
@@ -19,10 +20,19 @@ export default function Dashboard() {
               <Button variant="ghost" asChild>
                 <a href="/clients">Clients</a>
               </Button>
-              <Button variant="ghost">Invoices</Button>
-              <Button variant="ghost">Expenses</Button>
+              <Button variant="ghost" asChild>
+                <a href="/invoices">Invoices</a>
+              </Button>
+              <Button variant="ghost" asChild>
+                <a href="/expenses">Expenses</a>
+              </Button>
               <Button variant="ghost">Reports</Button>
-              <Button variant="ghost">Calendar</Button>
+              <Button variant="ghost" asChild>
+                <a href="/calendar">Calendar</a>
+              </Button>
+              <Button variant="ghost" asChild>
+                <a href="/profile">Profile</a>
+              </Button>
             </nav>
           </div>
         </div>
@@ -149,15 +159,17 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button className="w-full justify-start">
-                <FileText className="mr-2 h-4 w-4" />
-                Create Invoice
+              <Button className="w-full justify-start" asChild>
+                <a href="/invoices/new">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Create Invoice
+                </a>
               </Button>
               <Button variant="outline" className="w-full justify-start" asChild>
                 <a href="/clients/new">
@@ -173,6 +185,8 @@ export default function Dashboard() {
           </Card>
 
           <ExchangeRateWidget />
+
+          <ProfileSummary />
 
           <Card>
             <CardHeader>

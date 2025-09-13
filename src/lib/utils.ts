@@ -7,7 +7,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatCurrency(amountInCents: number, currency: string = 'EUR') {
   const amount = amountInCents / 100
-  return new Intl.NumberFormat('es-ES', {
+  
+  // Use appropriate locale based on currency for proper symbol placement
+  const locale = currency === 'USD' ? 'en-US' : 'es-ES'
+  
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
   }).format(amount)
