@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RETA Freelance Accounting
+
+A comprehensive freelance accounting application designed specifically for Spanish autónomos (self-employed workers) under the RETA (Régimen Especial de Trabajadores Autónomos) system.
+
+## Features
+
+- **Client Management**: Add, edit, and manage client information
+- **Invoice Generation**: Create and manage invoices with PDF export capabilities
+- **Expense Tracking**: Record and categorize business expenses
+- **Tax Calendar**: Track important Spanish tax deadlines (Modelo 130, Modelo 303)
+- **Exchange Rate Integration**: Real-time currency conversion for international clients
+- **Dashboard Analytics**: Overview of income, outstanding invoices, and tax obligations
+- **Profile Management**: Maintain business profile and settings
+
+## Tech Stack
+
+- **Framework**: Next.js 15.5.3 with React 19
+- **Database**: Prisma with SQLite
+- **UI Components**: Radix UI with Tailwind CSS
+- **Authentication**: NextAuth.js
+- **PDF Generation**: jsPDF with html2canvas
+- **Calendar**: Schedule-X calendar component
+- **Icons**: Lucide React
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ 
+- npm, yarn, pnpm, or bun
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Set up the database:
+
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+4. (Optional) Seed the database with sample data:
+
+```bash
+npx prisma db seed
+```
+
+### Development
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Building for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Database Schema
 
-To learn more about Next.js, take a look at the following resources:
+The application uses Prisma with the following main entities:
+- **Clients**: Customer information and contact details
+- **Invoices**: Invoice records with line items and status tracking
+- **Expenses**: Business expense records with categories
+- **Profile**: User business profile and tax settings
+- **Reminders**: Tax deadline and important date reminders
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Spanish Tax Compliance
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This application is specifically designed for Spanish freelancers and includes:
+- Quarterly tax deadline tracking (Modelo 130, Modelo 303)
+- RETA status monitoring
+- Spanish tax calendar integration
+- Euro-based calculations with international currency support
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Private project for freelance accounting management.
