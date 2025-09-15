@@ -1,38 +1,43 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
-interface NavigationProps {
-  currentPage?: 'dashboard' | 'clients' | 'invoices' | 'expenses' | 'reports' | 'calendar' | 'profile'
-}
-
-export function Navigation({ currentPage = 'dashboard' }: NavigationProps) {
-  const isActive = (page: string) => currentPage === page
+export function Navigation() {
+  const pathname = usePathname()
+  
+  const isActive = (path: string) => {
+    if (path === '/' && pathname === '/') return true
+    if (path !== '/' && pathname.startsWith(path)) return true
+    return false
+  }
 
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">RETA Freelance Accounting</h1>
+          <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-gray-700">
+            RETA Freelance Accounting
+          </Link>
           <nav className="flex space-x-4">
-            <Button variant={isActive('dashboard') ? 'default' : 'ghost'} asChild>
-              <a href="/">Dashboard</a>
+            <Button variant={isActive('/') ? 'default' : 'ghost'} asChild>
+              <Link href="/">Dashboard</Link>
             </Button>
-            <Button variant={isActive('clients') ? 'default' : 'ghost'} asChild>
-              <a href="/clients">Clients</a>
+            <Button variant={isActive('/clients') ? 'default' : 'ghost'} asChild>
+              <Link href="/clients">Clients</Link>
             </Button>
-            <Button variant={isActive('invoices') ? 'default' : 'ghost'}>
-              Invoices
+            <Button variant={isActive('/invoices') ? 'default' : 'ghost'} asChild>
+              <Link href="/invoices">Invoices</Link>
             </Button>
-            <Button variant={isActive('expenses') ? 'default' : 'ghost'}>
-              Expenses
+            <Button variant={isActive('/expenses') ? 'default' : 'ghost'} asChild>
+              <Link href="/expenses">Expenses</Link>
             </Button>
-            <Button variant={isActive('reports') ? 'default' : 'ghost'}>
-              Reports
+            <Button variant={isActive('/calendar') ? 'default' : 'ghost'} asChild>
+              <Link href="/calendar">Calendar</Link>
             </Button>
-            <Button variant={isActive('calendar') ? 'default' : 'ghost'}>
-              Calendar
-            </Button>
-            <Button variant={isActive('profile') ? 'default' : 'ghost'} asChild>
-              <a href="/profile">Profile</a>
+            <Button variant={isActive('/profile') ? 'default' : 'ghost'} asChild>
+              <Link href="/profile">Profile</Link>
             </Button>
           </nav>
         </div>

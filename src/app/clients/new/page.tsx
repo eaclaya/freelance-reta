@@ -61,31 +61,7 @@ export default function NewClientPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">RETA Freelance Accounting</h1>
-            <nav className="flex space-x-4">
-              <Button variant="ghost" asChild>
-                <a href="/">Dashboard</a>
-              </Button>
-              <Button variant="default" asChild>
-                <a href="/clients">Clients</a>
-              </Button>
-              <Button variant="ghost">Invoices</Button>
-              <Button variant="ghost">Expenses</Button>
-              <Button variant="ghost">Reports</Button>
-              <Button variant="ghost">Calendar</Button>
-              <Button variant="ghost" asChild>
-                <a href="/profile">Profile</a>
-              </Button>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto px-4 py-8 max-w-2xl">
         <div className="flex items-center mb-8">
           <Button variant="ghost" onClick={() => router.back()} className="mr-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -215,7 +191,6 @@ export default function NewClientPage() {
             </form>
           </CardContent>
         </Card>
-      </main>
     </div>
   )
 }
