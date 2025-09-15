@@ -132,7 +132,7 @@ export default function Dashboard() {
                       {currentQuarter === 1 && "Apr 20"}
                       {currentQuarter === 2 && "Jul 20"}
                       {currentQuarter === 3 && "Oct 20"}
-                      {currentQuarter === 4 && "Jan 30"}
+                      {currentQuarter === 4 && "Jan 20"}
                     </p>
                   </div>
                 </div>
@@ -150,7 +150,7 @@ export default function Dashboard() {
                       {currentQuarter === 1 && "Apr 20"}
                       {currentQuarter === 2 && "Jul 20"}
                       {currentQuarter === 3 && "Oct 20"}
-                      {currentQuarter === 4 && "Jan 30"}
+                      {currentQuarter === 4 && "Jan 20"}
                     </p>
                   </div>
                 </div>

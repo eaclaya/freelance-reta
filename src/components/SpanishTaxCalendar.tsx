@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { generateSpanishTaxReminders, generateMonthlyInvoiceReminders, type TaxReminder } from '@/lib/spanish-tax-reminders'
+import { EventDetailModal } from '@/components/EventDetailModal'
 
 interface SpanishTaxCalendarProps {
   invoices?: Array<{
@@ -21,6 +22,8 @@ interface SpanishTaxCalendarProps {
 export function SpanishTaxCalendar({ invoices = [], expenses = [] }: SpanishTaxCalendarProps) {
   const [reminders, setReminders] = useState<TaxReminder[]>([])
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [selectedEvent, setSelectedEvent] = useState<TaxReminder | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     // Generate reminders for current and next year
@@ -35,21 +38,6 @@ export function SpanishTaxCalendar({ invoices = [], expenses = [] }: SpanishTaxC
     setReminders(taxReminders)
   }, [invoices, expenses])
 
-  const getCalendarId = (category: string): string => {
-    switch (category) {
-      case 'modelo130':
-      case 'modelo303':
-      case 'modelo100':
-      case 'modelo390':
-        return 'tax-deadlines'
-      case 'invoice':
-        return 'invoice-reminders'
-      case 'reta':
-        return 'reta-payments'
-      default:
-        return 'payment-due'
-    }
-  }
 
   const getCategoryColor = (category: string): string => {
     switch (category) {
@@ -111,6 +99,16 @@ export function SpanishTaxCalendar({ invoices = [], expenses = [] }: SpanishTaxC
       const reminderDate = new Date(reminder.date)
       return reminderDate.toDateString() === dayDate.toDateString()
     })
+  }
+
+  const handleEventClick = (event: TaxReminder) => {
+    setSelectedEvent(event)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedEvent(null)
   }
 
   const monthNames = [
@@ -192,16 +190,26 @@ export function SpanishTaxCalendar({ invoices = [], expenses = [] }: SpanishTaxC
                     </div>
                     <div className="space-y-1">
                       {dayReminders.slice(0, 3).map(reminder => (
-                        <div
+                        <button
                           key={reminder.id}
-                          className={`text-xs p-1 rounded truncate ${getCategoryColor(reminder.category)}`}
+                          onClick={() => handleEventClick(reminder)}
+                          className={`text-xs p-1 rounded truncate w-full text-left hover:opacity-80 transition-opacity cursor-pointer ${getCategoryColor(reminder.category)}`}
                           title={reminder.title}
                         >
                           {reminder.title.length > 15 ? reminder.title.substring(0, 15) + '...' : reminder.title}
-                        </div>
+                        </button>
                       ))}
                       {dayReminders.length > 3 && (
-                        <div className="text-xs text-gray-500">+{dayReminders.length - 3} more</div>
+                        <button
+                          onClick={() => {
+                            if (dayReminders.length > 3) {
+                              handleEventClick(dayReminders[3])
+                            }
+                          }}
+                          className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
+                        >
+                          +{dayReminders.length - 3} more
+                        </button>
                       )}
                     </div>
                   </>
@@ -224,7 +232,11 @@ export function SpanishTaxCalendar({ invoices = [], expenses = [] }: SpanishTaxC
             })
             .slice(0, 10)
             .map(reminder => (
-              <div key={reminder.id} className={`p-4 rounded-lg border ${getCategoryColor(reminder.category)}`}>
+              <button
+                key={reminder.id}
+                onClick={() => handleEventClick(reminder)}
+                className={`w-full p-4 rounded-lg border hover:opacity-80 transition-opacity cursor-pointer text-left ${getCategoryColor(reminder.category)}`}
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3">
                     <span className="text-lg">{getPriorityIcon(reminder.priority)}</span>
@@ -242,10 +254,16 @@ export function SpanishTaxCalendar({ invoices = [], expenses = [] }: SpanishTaxC
                     </div>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
         </div>
       </div>
+
+      <EventDetailModal 
+        event={selectedEvent}
+        open={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   )
 }

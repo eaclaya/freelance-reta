@@ -74,14 +74,14 @@ export default async function CalendarPage() {
   function getNextTaxDeadline() {
     const currentYear = now.getFullYear()
     const deadlines = [
-      { name: 'Modelo 130 Q1', date: new Date(currentYear, 3, 30) },
-      { name: 'Modelo 303 Q1', date: new Date(currentYear, 3, 30) },
-      { name: 'Modelo 130 Q2', date: new Date(currentYear, 6, 30) },
-      { name: 'Modelo 303 Q2', date: new Date(currentYear, 6, 30) },
-      { name: 'Modelo 130 Q3', date: new Date(currentYear, 9, 30) },
-      { name: 'Modelo 303 Q3', date: new Date(currentYear, 9, 30) },
-      { name: 'Modelo 130 Q4', date: new Date(currentYear + 1, 0, 30) },
-      { name: 'Modelo 303 Q4', date: new Date(currentYear + 1, 0, 30) },
+      { name: 'Modelo 130 Q1', date: new Date(currentYear, 3, 20) },
+      { name: 'Modelo 303 Q1', date: new Date(currentYear, 3, 20) },
+      { name: 'Modelo 130 Q2', date: new Date(currentYear, 6, 20) },
+      { name: 'Modelo 303 Q2', date: new Date(currentYear, 6, 20) },
+      { name: 'Modelo 130 Q3', date: new Date(currentYear, 9, 20) },
+      { name: 'Modelo 303 Q3', date: new Date(currentYear, 9, 20) },
+      { name: 'Modelo 130 Q4', date: new Date(currentYear + 1, 0, 20) },
+      { name: 'Modelo 303 Q4', date: new Date(currentYear + 1, 0, 20) },
       { name: 'Modelo 100', date: new Date(currentYear + 1, 5, 30) },
       { name: 'Modelo 390', date: new Date(currentYear + 1, 0, 30) },
     ]
@@ -242,8 +242,8 @@ export default async function CalendarPage() {
               <div>
                 <h4 className="font-medium text-red-800">Quarterly Deadlines (High Priority)</h4>
                 <ul className="list-disc list-inside space-y-1 text-gray-600 mt-1">
-                  <li>Modelo 130 (IRPF): Jan 30, Apr 30, Jul 30, Oct 30</li>
-                  <li>Modelo 303 (VAT): Jan 30, Apr 30, Jul 30, Oct 30</li>
+                  <li>Modelo 130 (IRPF): Jan 20, Apr 20, Jul 20, Oct 20</li>
+                  <li>Modelo 303 (VAT): Jan 20, Apr 20, Jul 20, Oct 20</li>
                 </ul>
               </div>
               
@@ -256,9 +256,9 @@ export default async function CalendarPage() {
               </div>
 
               <div>
-                <h4 className="font-medium text-green-800">Monthly RETA</h4>
+                <h4 className="font-medium text-green-800">Quarterly RETA</h4>
                 <ul className="list-disc list-inside space-y-1 text-gray-600 mt-1">
-                  <li>Social Security payments: 30th of each month</li>
+                  <li>Social Security payments: Filed with tax documents on 20th</li>
                   <li>Variable amount based on contribution base</li>
                 </ul>
               </div>

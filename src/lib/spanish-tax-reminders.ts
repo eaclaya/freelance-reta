@@ -14,12 +14,12 @@ export function generateSpanishTaxReminders(year: number): TaxReminder[] {
   const reminders: TaxReminder[] = []
   
   // Modelo 130 - Quarterly Personal Income Tax (IRPF)
-  // Due dates: April 30, July 30, October 30, January 30
+  // Due dates: April 20, July 20, October 20, January 20
   const modelo130Quarters = [
-    { quarter: 'Q1', month: 3, day: 30, name: 'Q1 (Jan-Mar)' }, // April 30 for Q1
-    { quarter: 'Q2', month: 6, day: 30, name: 'Q2 (Apr-Jun)' }, // July 30 for Q2
-    { quarter: 'Q3', month: 9, day: 30, name: 'Q3 (Jul-Sep)' }, // October 30 for Q3
-    { quarter: 'Q4', month: 0, day: 30, name: 'Q4 (Oct-Dec)' }   // January 30 of next year for Q4
+    { quarter: 'Q1', month: 3, day: 20, name: 'Q1 (Jan-Mar)' }, // April 20 for Q1
+    { quarter: 'Q2', month: 6, day: 20, name: 'Q2 (Apr-Jun)' }, // July 20 for Q2
+    { quarter: 'Q3', month: 9, day: 20, name: 'Q3 (Jul-Sep)' }, // October 20 for Q3
+    { quarter: 'Q4', month: 0, day: 20, name: 'Q4 (Oct-Dec)' }   // January 20 of next year for Q4
   ]
 
   modelo130Quarters.forEach(({ quarter, month, day, name }) => {
@@ -51,12 +51,12 @@ export function generateSpanishTaxReminders(year: number): TaxReminder[] {
   })
 
   // Modelo 303 - Quarterly VAT (IVA)
-  // Due dates: April 30, July 30, October 30, January 30
+  // Due dates: April 20, July 20, October 20, January 20
   const modelo303Quarters = [
-    { quarter: 'Q1', month: 3, day: 30, name: 'Q1 (Jan-Mar)' },
-    { quarter: 'Q2', month: 6, day: 30, name: 'Q2 (Apr-Jun)' },
-    { quarter: 'Q3', month: 9, day: 30, name: 'Q3 (Jul-Sep)' },
-    { quarter: 'Q4', month: 0, day: 30, name: 'Q4 (Oct-Dec)' }
+    { quarter: 'Q1', month: 3, day: 20, name: 'Q1 (Jan-Mar)' },
+    { quarter: 'Q2', month: 6, day: 20, name: 'Q2 (Apr-Jun)' },
+    { quarter: 'Q3', month: 9, day: 20, name: 'Q3 (Jul-Sep)' },
+    { quarter: 'Q4', month: 0, day: 20, name: 'Q4 (Oct-Dec)' }
   ]
 
   modelo303Quarters.forEach(({ quarter, month, day, name }) => {
@@ -123,37 +123,42 @@ export function generateSpanishTaxReminders(year: number): TaxReminder[] {
     priority: 'medium'
   })
 
-  // RETA Monthly Payments
-  // Due date: 30th of each month
-  for (let month = 0; month < 12; month++) {
-    const monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ]
+  // RETA Quarterly Payments
+  // Due dates align with tax filing: April 20, July 20, October 20, January 20
+  const retaQuarters = [
+    { quarter: 'Q1', month: 3, day: 20, name: 'Q1 (Jan-Mar)' }, // April 20 for Q1
+    { quarter: 'Q2', month: 6, day: 20, name: 'Q2 (Apr-Jun)' }, // July 20 for Q2
+    { quarter: 'Q3', month: 9, day: 20, name: 'Q3 (Jul-Sep)' }, // October 20 for Q3
+    { quarter: 'Q4', month: 0, day: 20, name: 'Q4 (Oct-Dec)' }   // January 20 of next year for Q4
+  ]
+
+  retaQuarters.forEach(({ quarter, month, day, name }) => {
+    const dueYear = quarter === 'Q4' ? year + 1 : year
+    const dueMonth = quarter === 'Q4' ? 0 : month // January is month 0
     
     reminders.push({
-      id: `reta-${year}-${month}`,
-      title: `RETA Payment - ${monthNames[month]} ${year}`,
-      description: `Monthly RETA (Social Security) payment for autonomous workers. Amount varies based on contribution base.`,
+      id: `reta-${quarter}-${year}`,
+      title: `RETA Payment - ${name}`,
+      description: `Quarterly RETA (Social Security) payment for autonomous workers, filed together with tax documentation. Amount varies based on contribution base.`,
       type: 'RETA_PAYMENT',
-      date: new Date(year, month, 30),
+      date: new Date(dueYear, dueMonth, day),
       recurring: false,
       category: 'reta',
       priority: 'medium'
     })
 
-    // Reminder 3 days before
+    // Reminder same day as tax filing reminder
     reminders.push({
-      id: `reta-${year}-${month}-reminder`,
-      title: `RETA Payment Due Soon - ${monthNames[month]}`,
-      description: `Reminder: RETA payment is due in 3 days. Check your contribution amount.`,
+      id: `reta-${quarter}-${year}-reminder`,
+      title: `RETA Payment Due Soon - ${name}`,
+      description: `Reminder: RETA payment is due with tax filings in 7 days. Prepare contribution documentation.`,
       type: 'RETA_PAYMENT',
-      date: new Date(year, month, 27),
+      date: new Date(dueYear, dueMonth, day - 7),
       recurring: false,
       category: 'reta',
       priority: 'medium'
     })
-  }
+  })
 
   return reminders.sort((a, b) => a.date.getTime() - b.date.getTime())
 }
